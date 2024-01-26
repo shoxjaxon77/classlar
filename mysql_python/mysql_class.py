@@ -129,15 +129,12 @@ class Database:
         self.ishlatish(sql,commit=True)
 
     #20
-    def insert_tulov(self,ism,familiya,tulov,kurs_nomi):
-        sql = (f"")
-        self.ishlatish(sql,commit=True)
+    # def insert_tulov(self,ism,familiya,tulov,kurs_nomi):
+    #     sql = (f"")
+    #     self.ishlatish(sql,commit=True)
         
     #21
     def change_dars_vaqti(self,ism,familiya,new_vaqt):
         sql = (f"UPDATE uqituvchi_kurslari SET vaqti = '{new_vaqt}' WHERE uqituvchi_id IN(SELECT id FROM uqituvchilar WHERE ism = '{ism}' AND familiya='{familiya}') ")
         self.ishlatish(sql,commit=True)
-        
-    #22
-    # def SqlToTable(self,table_name):
 
