@@ -24,6 +24,8 @@ print("Berilgan sanada amalga oshirilgan to'lovlar soni:",'\n',base.count_tulovl
 
 print("Berilgan sanada amalga oshirilgan to'lovlar summasi:",'\n',base.sum_tulovlar("2024-01-04"))
 
+print("Berilgan sanalar oralig'idagi to'lovlar summasi:",'\n',base.sum_sanalar_tulovi("2024-01-04","2024-01-10"))
+
 print("Berilgan id dagi o'qituvchi uchun o'tkazilgan to'lovlar summasi:",'\n',base.sum_uqituvchi_tulovlari(8,"2023-12-05","2024-01-04"))
 
 print("Berilgan sanada amalga oshirilgan to'lovlar soni:",'\n',base.sum_uquvchi_tulovlari(5))
