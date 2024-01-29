@@ -38,4 +38,6 @@ base.insert_uquvchilar("Shoxjaxon","Atabayev","2004-09-02","+998904313414")
 
 base.insert_uqituvchilar("Atabayev","Shoxjaxon","Malumotlarbazasi","+998904313414")
 
+base.insert_yulov("Umida","Tajiyeva",200000,"ingliz tili")
+
 base.change_dars_vaqti("Janar","Yusupova","15:00:00")
