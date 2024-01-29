@@ -129,9 +129,13 @@ class Database:
         self.ishlatish(sql,commit=True)
 
     #20
-    # def insert_tulov(self,ism,familiya,tulov,kurs_nomi):
-    #     sql = (f"")
-    #     self.ishlatish(sql,commit=True)
+    def insert_tulov(self,ism,familiya,tulov,kurs_nomi):
+        UquvchiId = self.fio(ism,familiya)
+        KursId = self.kurs_id(kurs_nomi)
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        sql = f"INSERT INTO tulovlar(uquvchi_id,tulov,kurs_id,vaqti) VALUES({UquvchiId[0]},'{tulov}',{KursId[0]},'{date}')"
+        self.ishlatish(sql,commit=True)
         
     #21
     def change_dars_vaqti(self,ism,familiya,new_vaqt):
