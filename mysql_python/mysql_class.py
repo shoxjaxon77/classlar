@@ -130,14 +130,15 @@ class Database:
 
     #20
     def insert_tulov(self,ism,familiya,tulov,kurs_nomi):
-        sql = (f"")
+        UquvchiId = self.fio(ism,familiya)
+        KursId = self.kurs_id(kurs_nomi)
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        sql = f"INSERT INTO tulovlar(uquvchi_id,tulov,kurs_id,vaqti) VALUES({UquvchiId[0]},'{tulov}',{KursId[0]},'{date}')"
         self.ishlatish(sql,commit=True)
         
     #21
     def change_dars_vaqti(self,ism,familiya,new_vaqt):
         sql = (f"UPDATE uqituvchi_kurslari SET vaqti = '{new_vaqt}' WHERE uqituvchi_id IN(SELECT id FROM uqituvchilar WHERE ism = '{ism}' AND familiya='{familiya}') ")
         self.ishlatish(sql,commit=True)
-        
-    #22
-    # def SqlToTable(self,table_name):
 
