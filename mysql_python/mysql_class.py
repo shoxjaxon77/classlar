@@ -1,4 +1,6 @@
 import mysql.connector 
+from datetime import datetime
+
 
 class Database:
     #1
@@ -14,23 +16,22 @@ class Database:
             database="oquv_markazi"
         )
     
-    def ishlatish(self,sql,fetchall=False,fetchone=False,commit=False):
-        data=None
+    def ishlatish(self, sql, fetchall=False, fetchone=False, commit=False):
+        db = self.ulanish()
+        cursor = self.db.cursor()
+        data = None
         if fetchall:
-            self.cursor.execute(sql)
-            data = self.cursor.fetchall()
+            cursor.execute(sql)
+            data = cursor.fetchall()
         elif fetchone:
-            self.cursor.execute(sql)
-            data = self.cursor.fetchone()
+            cursor.execute(sql)
+            data = cursor.fetchone()
         elif commit:
-            self.cursor.execute(sql)
-            self.db.commit()
+            cursor.execute(sql)
+            db.commit()
 
-        if data:
-            a=""
-            for i in data:
-                a+= str(i)+'\n'
-            return a
+        db.close()
+        return data
 
     #2
     def kurslar_nomi(self):
@@ -128,17 +129,83 @@ class Database:
         sql = (f"INSERT INTO uqituvchilar(ism,familiya,yunalishi,tel_raqami) VALUES('{ism}','{familiya}','{yunalishi}','{tel}')")
         self.ishlatish(sql,commit=True)
 
-    #20
-    def insert_tulov(self,ism,familiya,tulov,kurs_nomi):
-        UquvchiId = self.fio(ism,familiya)
-        KursId = self.kurs_id(kurs_nomi)
-        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def uquvchi_id(self,ism, familiya):
+        sql = f"""
+                SELECT id 
+                FROM uquvchilar
+                WHERE ism = '{ism}' AND familiya = '{familiya}'
+                """
+        return self.ishlatish(sql, fetchone=True)
 
-        sql = f"INSERT INTO tulovlar(uquvchi_id,tulov,kurs_id,vaqti) VALUES({UquvchiId[0]},'{tulov}',{KursId[0]},'{date}')"
-        self.ishlatish(sql,commit=True)
+    def kurs_id(self, kurs_nomi):
+        sql = f"""
+                SELECT id 
+                FROM kurslar
+                WHERE kurs_nomi = '{kurs_nomi}'
+        """
+        return self.ishlatish(sql, fetchone=True)
+
+    #20
+    def insert_tulov(self, ism, familiya, tulov, kurs_nomi):
+        UquvchiId = self.uquvchi_id(ism, familiya)
+        KursId = self.kurs_id(kurs_nomi)
+        sana = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        sql = f"""
+            INSERT INTO tulovlar 
+            VALUES
+            ({UquvchiId[0]}, {tulov}, {KursId[0]}, '{sana}')
+        """
+        self.ishlatish(sql, commit=True)
         
     #21
     def change_dars_vaqti(self,ism,familiya,new_vaqt):
         sql = (f"UPDATE uqituvchi_kurslari SET vaqti = '{new_vaqt}' WHERE uqituvchi_id IN(SELECT id FROM uqituvchilar WHERE ism = '{ism}' AND familiya='{familiya}') ")
         self.ishlatish(sql,commit=True)
+        
+    #22
+    def SqlToJadval(self, nomi):
+        sql = f"SELECT * FROM {nomi}"
+        data = self.ishlatish(sql, fetchall=True)
+        excel_table = Excel()
+        excel_table.write_table(data)
 
+    #23
+    def TableToSql(self,fayl_nomi=None):
+        excel = Excel(f"{fayl_nomi}.xlsx","Sheet")
+        a = excel.read_text()
+        # b = ""
+        # for i in a:
+        #     b+=str(i)+","
+        # print(b)
+        a = excel.read_text()
+        b = ",".join(map(str, a))
+        print(b)
+        sql = f"INSERT INTO yangi_uquvchilar(id,ism,familiya,t_sana,t_raqam) VALUES({b})"
+        self.ishlatish(sql,commit=True)
+
+from openpyxl import Workbook, load_workbook
+
+class Excel:
+    def __init__(self, name=None, list_nomi=None):
+    # def __init__(self, name=None):
+        if name:
+            self.file = load_workbook(name)
+            self.jadval = self.file[list_nomi]
+        else:
+            self.file = Workbook()
+            self.jadval = self.file.active
+
+    def read_text(self):
+        l = []
+        for i in self.jadval.iter_rows(min_row=1,max_row=self.jadval.max_row, values_only=True):  
+            l.append(i)
+        return l
+
+    def write_table(self, data):
+        # self.jadval.append(["№", "ism", "familiya", "T_sana", "Tel"])
+        for i in data:
+            self.jadval.append(i)
+        self.saqlash("uquvchilar.xlsx")
+
+    def saqlash(self, manzil=None):
+        self.file.save(manzil)
